@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gatekeeper-policies
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/gmann-presidio/iu-kubesec.git
+    targetRevision: HEAD
+    path: apps/opa-gatekeeper/policies
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gatekeeper-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

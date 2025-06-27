@@ -1,0 +1,20 @@
+replicaCount: 1
+image:
+  repository: nginx
+  tag: alpine
+
+name: blue
+namespace: blue
+
+htmlContent: |
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta http-equiv="refresh" content="3">
+    <title>GitOps Demo</title>
+  </head>
+  <body style="background-color: blue; color: white; text-align: center; padding: 5rem;">
+    <h1>Welcome to GitOps in Blue!</h1>
+    <p>This page is self-managed using Argo CD.</p>
+  </body>
+  </html>
