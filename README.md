@@ -92,8 +92,9 @@ Each web app includes a sidecar container to scan NFS repositories, and report o
     https://github.com/<your-organizatoin>/<your-repo>.git
     ```
 5. Push all changes
-6. Browse to you ArgoCD instance, which should be available at your port-forwarded path, `https://localhost:8080`
-7. You should see applications begin to appear as app tiles
+6. Install the ArgoCD app of apps file into your cluster: `kubectl apply -f argo-apps.yaml`
+7. Browse to you ArgoCD instance, which should be available at your port-forwarded path, `https://localhost:8080`
+8. You should see applications begin to appear as app tiles
 
 ## Using this Delivery
 

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+      annotations:
+        configmap.reloader.stakater.com/reload: "gitops-html-content"
+    spec:
+      containers:
+        - name: nginx
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html-volume
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+        - name: {{ .Values.scansidecar.name }}
+          image: {{ .Values.scansidecar.image }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              freshclam && \
+              while true; do
+                echo "Scanning files..."
+                clamscan -r /scan-volume
+                sleep 60
+              done
+          volumeMounts:
+            - name: html-volume
+              mountPath: /scan-volume
+              readOnly: true
+      volumes:
+        - name: html-volume
+          configMap:
+            name: {{ .Values.name }}-configmap

@@ -1,0 +1,26 @@
+replicaCount: 1
+image:
+  repository: nginx
+  tag: alpine
+
+ingress:
+  allowedCIDR: 127.0.0.1/32
+
+name: gitops-demo
+namespace: default
+scansidecar:
+  name: clamav
+  image: "mkodockx/docker-clamav:alpine"
+
+htmlContent: |
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta http-equiv="refresh" content="3">
+    <title>GitOps Demo</title>
+  </head>
+  <body style="background-color: lightblue; text-align: center; padding: 5rem;">
+    <h1>Welcome to GitOps!</h1>
+    <p>This page is deployed using Argo CD.</p>
+  </body>
+  </html>

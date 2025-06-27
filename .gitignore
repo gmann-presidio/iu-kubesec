@@ -7,10 +7,6 @@
 *.tmp
 *.cache
 
-# Ignore Helm charts / templates build outputs
-charts/
-templates/
-
 # Kubernetes config / secret files (optional, if you don't want them committed)
 *.kubeconfig
 *.secret.yaml

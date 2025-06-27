@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-ingress-allow-egress
+  namespace: {{ .Release.Namespace }}  # If using Helm
+spec:
+  podSelector: {}  # Applies to all pods in the namespace
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector: {}  # Allow from pods in the same namespace
+        - ipBlock:
+            cidr: 127.0.0.1/32  # Allow from localhost
+  egress:
+    - {}  # Allow all egress traffic
