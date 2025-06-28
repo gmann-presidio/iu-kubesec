@@ -1,7 +1,8 @@
 replicaCount: 1
 image:
-  repository: nginx
-  tag: alpine
+  registry: docker.io
+  repository: gmannpresidio/iu-apache
+  tag: latest
 
 ingress:
   allowedCIDR: 127.0.0.1/32
