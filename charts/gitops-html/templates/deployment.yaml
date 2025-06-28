@@ -15,7 +15,8 @@ spec:
       labels:
         app: {{ .Values.name }}
       annotations:
-        configmap.reloader.stakater.com/reload: "gitops-html-content"
+        configmap.reloader.stakater.com/reload: {{ .Values.name }}-configmap
+        reloader.stakater.com/match: "true"
     spec:
       containers:
         - name: nginx
