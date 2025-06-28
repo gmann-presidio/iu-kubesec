@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/gmann-presidio/iu-kubesec.git
-    targetRevision: feature/playwithstuff    # ← point to the desired branch here
+    targetRevision: main    # ← point to the desired branch here
     path: argo-apps
     directory:
       recurse: true
