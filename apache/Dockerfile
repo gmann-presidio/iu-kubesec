@@ -18,7 +18,7 @@ RUN apt-get update && \
     apt-get install -y libapache2-mod-auth-cas
 
 
-#    ServerName ssh-01-bl-test.webtech.uits.iu.edu\n\
+#    ServerName ssh-01-bl-test.webtech.uits.abstracted.domain\n\
 COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY httpd-vhosts.conf /usr/local/apache2/conf/extra/httpd-vhosts.conf
 COPY alias.conf /usr/local/apache2/conf/extra/alias.conf

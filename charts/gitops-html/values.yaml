@@ -11,7 +11,7 @@ name: gitops-demo
 namespace: default
 scansidecar:
   name: clamav
-  image: "mkodockx/docker-clamav:alpine"
+  image: "mkodockx/docker-clamav:alpine" #1.0.9
 
 htmlContent: |
   <!DOCTYPE html>
