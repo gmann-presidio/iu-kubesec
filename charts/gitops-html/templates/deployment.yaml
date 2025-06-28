@@ -18,12 +18,12 @@ spec:
         configmap.reloader.stakater.com/reload: {{ .Values.name }}-configmap
         reloader.stakater.com/match: "true"
     spec:
-      securityContext:
-        runAsUser: 33
-        runAsGroup: 33
       containers:
         - name: apache
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          securityContext:
+            runAsUser: 33
+            runAsGroup: 33
           ports:
             - containerPort: 80
           volumeMounts:
