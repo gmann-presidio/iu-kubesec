@@ -9,9 +9,12 @@ ingress:
 
 name: gitops-demo
 namespace: default
+
 scansidecar:
   name: clamav
-  image: "mkodockx/docker-clamav:alpine" #1.0.9
+  registry: docker.io
+  repository: mkodockx/docker-clamav
+  tag: 1.0.9-alpine
 
 htmlContent: |
   <!DOCTYPE html>
