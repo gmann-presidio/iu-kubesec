@@ -19,16 +19,30 @@ spec:
         reloader.stakater.com/match: "true"
     spec:
       containers:
-        - name: nginx
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        - name: {{ .Values.webserver }}
+          image: >-
+            {{- if .Values.image.registry }}
+            {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
+            {{- else }}
+            {{ .Values.image.repository }}:{{ .Values.image.tag }}
+            {{- end }}
+          {{- if not .Values.image.registry }}
+          imagePullPolicy: Never
+          {{- end }}
+          {{- if eq .Values.webserver "apache" }}
+          securityContext:
+            runAsUser: 33
+            runAsGroup: 33
+          {{- end }}
           ports:
             - containerPort: 80
           volumeMounts:
             - name: html-volume
-              mountPath: /usr/share/nginx/html/index.html
-              subPath: index.html
+              mountPath: {{ if eq .Values.webserver "apache" }}/usr/local/apache2/htdocs{{ else }}/usr/share/nginx/html{{ end }}
+              readOnly: true
+
         - name: {{ .Values.scansidecar.name }}
-          image: {{ .Values.scansidecar.image }}
+          image: "{{ .Values.scansidecar.registry }}/{{ .Values.scansidecar.repository }}:{{ .Values.scansidecar.tag }}"
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -42,6 +56,7 @@ spec:
             - name: html-volume
               mountPath: /scan-volume
               readOnly: true
+
       volumes:
         - name: html-volume
           configMap:

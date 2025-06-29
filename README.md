@@ -12,6 +12,9 @@ This repository contains example code for use by Indiana University. In response
   - [Installation](#installation)
   - [Using this Delivery](#using-this-delivery)
     - [The Argo Apps](#the-argo-apps)
+      - [Common values](#common-values)
+      - [App (override) values](#app-override-values)
+      - [Build and Use a Local Image](#build-and-use-a-local-image)
     - [Change an App in ArgoCD](#change-an-app-in-argocd)
     - [Try to change an App in Kubectl](#try-to-change-an-app-in-kubectl)
     - [Turn Off Self-Healing](#turn-off-self-healing)
@@ -27,7 +30,7 @@ This repository is built around the following components for simplicity of use a
 - [ArgoCD](https://argo-cd.readthedocs.io/en/stable/getting_started/)
 - [OPA Gatekeeper](https://open-policy-agent.github.io/gatekeeper/website/docs/)
 - [Stakater Reloader](https://github.com/stakater/Reloader)
-    - Helps with visuals on the config-map based web apps
+  - Helps with visuals on the config-map based web apps
 
 ## Concepts
 
@@ -40,7 +43,7 @@ Example code written here is meant to address some subjects discussed with India
 
 ### 1. Continuous Delivery and Enforcement of Web Apps with ArgoCD
 
-Two small web applications are provided, each served as a single HTML file by nginx. The ArgoCD application keeps them in place and self-healed. An example is provided for changing each and watching them self-heal. Each app is defined under an umbrella "app of apps" in ArgoCD, which governs apps in a single folder.
+Two small web applications are provided, each served as a single HTML file. Files may be served either by nginx or apache The ArgoCD application keeps them in place and self-healed. An example is provided for changing each and watching them self-heal. Each app is defined under an umbrella "app of apps" in ArgoCD, which governs apps in a single folder.
 
 ```sh
 argo-apps.yaml   # This is an "app of apps"
@@ -51,7 +54,7 @@ argo-apps.yaml   # This is an "app of apps"
       |_ values.yaml
 ```
 
-The two web apps are each created by helm templates that are maintined centrally. Templates are stored in ./charts/gitops-html/templates. 
+The two web apps are each created by helm templates that are maintined centrally. Templates are stored in ./charts/gitops-html/templates.
 
 ### 2. Pod Governance with OPA Gatekeeper
 
@@ -69,7 +72,7 @@ Each web app includes a sidecar container to scan NFS repositories, and report o
 
 1. Install [minikube](https://minikube.sigs.k8s.io/docs/start)
 2. Install ArgoCD on minikube
-   
+
     ```sh
     kubectl create namespace argocd
     kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
@@ -91,6 +94,7 @@ Each web app includes a sidecar container to scan NFS repositories, and report o
     # REPLACE WITH
     https://github.com/<your-organizatoin>/<your-repo>.git
     ```
+
 5. Push all changes
 6. Install the ArgoCD app of apps file into your cluster: `kubectl apply -f argo-apps.yaml`
 7. Browse to you ArgoCD instance, which should be available at your port-forwarded path, `https://localhost:8080`
@@ -104,16 +108,62 @@ Each application is set up in the directory `argo-apps`. For simplicity, one fil
 
 Both cluster infrastructure and user-level applications are placed in this repository. All are under a single *argo project*, "default." In a more mature delivery, separate argo projects should be defined to support other levels of applications. This is left as an exercise for the user, and is well documented by the Argo project.
 
-Content sources: 
+Content sources:
 
-    - For the apps "blue" and "green," the content is sourced from this repository. Other apps may be created in a similar way by cloning each of these. 
-    - For infra apps such as the stakater-reloader and OPA Gatekeeper, content is sourced from their project's repositories. Other infra apps may be installed in a similar way, by following patterns on those files.
+- For the apps "blue" and "green," the content is sourced from this repository. Other apps may be created in a similar way by cloning each of these.
+- For infra apps such as the stakater-reloader and OPA Gatekeeper, content is sourced from their project's repositories. Other infra apps may be installed in a similar way, by following patterns on those files.
 
-App values:
+#### Common values
 
-Application-specific configuration values are kept in the /apps directories. For clarity, each app is given its own folder. (This is not necessarily required by ArgoCD.) App folders contain values.yaml (where applicable) or application specific files. Argo apps often point to app values files, and the values may be tuned outside of the lifecycle of any other app. These are meant to stay small and very specific. 
+Common values include important global details such as web server types and versions. Adjustment of any of these will affect all web applications unless overridden by an app values.yaml file. 
 
-Common values such as web server versions are meant to live in a more general location. That is kept in their helm chart directory at `/argo-apps/charts/gitops-html/values.yaml`.
+These values are most important:
+
+```yaml
+webserver: apache  # options: nginx or apache
+
+image:
+  registry: ""  # Leave empty if using local image, or change to docker.io (or as appropriate) for published image
+  repository: iu-apache  # For nginx: library/nginx
+  tag: latest  # Or as appropriate
+
+ingress:
+  allowedCIDR: 127.0.0.1/32  # This is tuned for minikube running in a local environment. Adjust as needed
+
+scansidecar:  # These values suggest an open source clamav scanner. Adjust as needed.
+  name: clamav
+  registry: docker.io
+  repository: mkodockx/docker-clamav
+  tag: 1.0.9-alpine
+```
+
+such as web server versions are meant to live in a more general location. That is kept in their helm chart directory at
+`/argo-apps/charts/gitops-html/values.yaml`.
+
+#### App (override) values
+
+Application-specific configuration values are kept in the /apps directories. Placing values here will override values found in the common values.yaml. For clarity, each app is given its own folder. (This is not necessarily required by ArgoCD.) App folders contain small, targeted values.yaml files or application specific files.
+
+#### Build and Use a Local Image
+
+For portability, custom images are not built and pushed to external repositories. Instead, they are loaded into minikube for local use. One example is the Apache custom image, resembling the apache server built and used by IU. These commands may be used to build and load it into minikube for local work and testing:
+
+```sh
+# Bash
+docker build -t iu-apache:latest . && minikube image load iu-apache:latest
+
+# Powershell
+docker build -t iu-apache:latest .; if ($?) { minikube image load iu-apache:latest }
+```
+
+After that, the iu-apache image may be referred in values.yaml as
+
+```yaml
+image:
+  registry: ""  # Leave empty if using local image
+  repository: iu-apache
+  tag: latest
+```
 
 ### Change an App in ArgoCD
 
@@ -127,8 +177,8 @@ Common values such as web server versions are meant to live in a more general lo
 
 Make a small change to the configmap in the "blue" namespace: `kubectl edit cm -n blue blue-configmap`
 
-    - Change "GitOps" to "ArgoCD"
-    - Save and close the configmap
+- Change "GitOps" to "ArgoCD"
+- Save and close the configmap
 
 Get the configmap again, examine it for your changes: `kubectl get cm -n blue blue-configmap -o yaml`
 

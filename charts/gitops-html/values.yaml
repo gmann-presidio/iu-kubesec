@@ -1,16 +1,22 @@
+webserver: apache  # options: nginx or apache
+
 replicaCount: 1
 image:
-  repository: nginx
-  tag: alpine
+  registry: ""  # Leave empty if using local image
+  repository: iu-apache
+  tag: latest
 
 ingress:
   allowedCIDR: 127.0.0.1/32
 
 name: gitops-demo
 namespace: default
+
 scansidecar:
   name: clamav
-  image: "mkodockx/docker-clamav:alpine"
+  registry: docker.io
+  repository: mkodockx/docker-clamav
+  tag: 1.0.9-alpine
 
 htmlContent: |
   <!DOCTYPE html>
