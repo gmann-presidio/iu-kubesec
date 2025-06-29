@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  # registry: docker.io  - Populate this if pulling from a registry, leave blank if loading a local image
+  registry: ""  # Leave empty if using local image
   repository: iu-apache
   tag: latest
 
