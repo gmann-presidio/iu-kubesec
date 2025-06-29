@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/gmann-presidio/iu-kubesec.git
-    targetRevision: feature/apache
+    targetRevision: main
     path: charts/gitops-html
     helm:
       valueFiles:
