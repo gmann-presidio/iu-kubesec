@@ -20,7 +20,12 @@ spec:
     spec:
       containers:
         - name: apache
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: >-
+            {{- if .Values.image.registry }}
+            {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
+            {{- else }}
+            {{ .Values.image.repository }}:{{ .Values.image.tag }}
+            {{- end }}
           securityContext:
             runAsUser: 33
             runAsGroup: 33
