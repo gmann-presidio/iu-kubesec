@@ -1,3 +1,5 @@
+webserver: apache  # options: nginx or apache
+
 replicaCount: 1
 image:
   registry: ""  # Leave empty if using local image
